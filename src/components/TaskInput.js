@@ -1,14 +1,28 @@
 import React,{useState} from 'react';
 import {View, TextInput, Button, StyleSheet,Modal} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker'
+import { scheduleLocalNotification } from '../services/LocalPushController'
 
 const TaskInput = props => {
     const [enteredTask, setEnteredTask] = useState('');
+    const [date, setDate] = useState(() => Date.now());
+    const [show, setShow] = useState(false);
     const taskInputHandler = (enteredTask) =>  {
         setEnteredTask(enteredTask);
     };
     const addTaskHandler = () => {
       props.onAddTask(enteredTask);
+      setShow(true);
       setEnteredTask('');
+    }
+    // Handle changes in time picker value
+    const handleTimeChange = (event, selected) => {
+      const currDate = selected || date;
+      setShow(false);
+      if (currDate.getTime() !== date.getTime()) {
+        scheduleLocalNotification(currDate.getTime()-new Date(Date.now()).getTime());
+        setDate(currDate);
+      };
     }
     return(
       <Modal visible={props.visible} animationType="slide">
@@ -28,6 +42,14 @@ const TaskInput = props => {
             </View>
           </View>
       </View>
+      {show && 
+      <DateTimePicker
+        onChange = {handleTimeChange}
+        value = {date}
+        mode = "time"
+        is24Hour = {true}
+        display = "clock"
+      />}
     </Modal>
     );
 };
