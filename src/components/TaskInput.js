@@ -18,40 +18,43 @@ const TaskInput = props => {
     // Handle changes in time picker value
     const handleTimeChange = (event, selected) => {
       const currDate = selected || date;
+      console.log(date)
       setShow(false);
-      if (currDate.getTime() !== date.getTime()) {
+      if (currDate.getTime() !== date) {
         scheduleLocalNotification(currDate.getTime()-new Date(Date.now()).getTime());
         setDate(currDate);
       };
     }
     return(
-      <Modal visible={props.visible} animationType="slide">
-        <View style={styles.inputContainer}>
-          <TextInput 
-            placeholder="Input YOUR TASK !!" 
-            style={styles.input} 
-            onChangeText={taskInputHandler}
-            value={enteredTask}
-          />
-          <View style={styles.buttonContainer}>
-            <View style={styles.button}>
-              <Button title="Cancel" color="red" onPress={props.onCancel}></Button>
+      <>
+        <Modal visible={props.visible} animationType="slide">
+          <View style={styles.inputContainer}>
+            <TextInput 
+              placeholder="Input YOUR TASK !!" 
+              style={styles.input} 
+              onChangeText={taskInputHandler}
+              value={enteredTask}
+            />
+            <View style={styles.buttonContainer}>
+              <View style={styles.button}>
+                <Button title="Cancel" color="red" onPress={props.onCancel}></Button>
+              </View>
+              <View style={styles.button}>
+                <Button title="Add Task" onPress={addTaskHandler}></Button>
+              </View>
             </View>
-            <View style={styles.button}>
-              <Button title="Add Task" onPress={addTaskHandler}></Button>
-            </View>
-          </View>
-      </View>
-      {show && 
-      <DateTimePicker
-        onChange = {handleTimeChange}
-        value = {date}
-        mode = "time"
-        is24Hour = {true}
-        display = "clock"
-      />}
-    </Modal>
-    );
+        </View>
+        </Modal>
+        {show && 
+          <DateTimePicker
+            onChange = {handleTimeChange}
+            value = {date}
+            mode = "time"
+            is24Hour = {true}
+            display = "clock"
+          />}
+      </>
+      );
 };
 const styles = StyleSheet.create({
     inputContainer:{

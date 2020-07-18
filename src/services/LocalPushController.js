@@ -1,11 +1,12 @@
 import PushNotifications from 'react-native-push-notification'
+import { Platform } from 'react-native';
 
 PushNotifications.configure({
     onNotification: function(notification) {
         console.log("LOCAL NOTIFICATION => ", notification)
     },
     popInitialNotification: true,
-    requestPermissions: true
+    requestPermissions: Platform.OS === 'ios'
 })
 
 export const LocalNotification = () => {
