@@ -4,7 +4,8 @@ const TaskItem = props => {
     return (
         <TouchableOpacity onPress={props.onDelete.bind(this,props.id)}>
             <View style={styles.listItem}> 
-                <Text>{props.title}</Text> 
+                <Text>{props.title}</Text>
+                <Text>{props.endTime}</Text> 
             </View>
         </TouchableOpacity>
     )
@@ -15,7 +16,9 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         backgroundColor: '#ccc',
         borderColor: 'black',
-        borderWidth: 1
+        borderWidth: 1,
+        flexDirection: "row",
+        justifyContent: "space-between"
       }
 });
 export default TaskItem;

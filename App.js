@@ -8,10 +8,10 @@ export default function App() {
   const [courseTasks, setCourseTasks] = useState([]);
   const [isAddMore, setIsAddMore] = useState(false);
 
-  const addTaskHandler = (taskTitle) => {
+  const addTaskHandler = (taskObj) => {
     setCourseTasks(currentTasks => [
       ...currentTasks, 
-      {id: Math.random().toString(), value: taskTitle } 
+      {id: Math.random().toString(), value: taskObj.taskTitle, endTime: taskObj.endTime} 
     ]);
     setIsAddMore(false);
   };
@@ -38,7 +38,7 @@ export default function App() {
         <FlatList
         keyExtractor={(item,index)=>item.id} 
         data={courseTasks} 
-        renderItem={itemData => <TaskItem id={itemData.item.id} onDelete={removeTaskHandler} title={itemData.item.value} />} />
+        renderItem={itemData => <TaskItem id={itemData.item.id} onDelete={removeTaskHandler} title={itemData.item.value} endTime = {itemData.item.endTime} />} />
         
       </View>
     </View>
