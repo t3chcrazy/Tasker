@@ -11,7 +11,7 @@ const TaskInput = props => {
         setEnteredTask(enteredTask);
     };
     const addTaskHandler = () => {
-      props.onAddTask({taskTitle: enteredTask, endTime: date.toLocaleTimeString("en-US")});
+      props.onAddTask({taskTitle: enteredTask, endTime: date.toLocaleTimeString("en-US").substring(0, 5)});
       setEnteredTask('');
     }
     // Handle changes in time picker value
@@ -20,7 +20,8 @@ const TaskInput = props => {
       console.log(currDate.toLocaleTimeString([], {is24Hour: false}))
       setShow(false);
       if (currDate.getTime() !== date.getTime()) {
-        scheduleLocalNotification(currDate.getTime()-new Date(Date.now()).getTime());
+        currDate.setSeconds(0);
+        scheduleLocalNotification(currDate.getTime()-new Date(Date.now()).getTime(), enteredTask);
         setDate(currDate);
       };
     }
@@ -28,12 +29,20 @@ const TaskInput = props => {
       <>
         <Modal visible={props.visible} animationType="slide">
           <View style={styles.inputContainer}>
-            <TextInput 
-              placeholder="Input YOUR TASK !!" 
-              style={styles.input} 
-              onChangeText={taskInputHandler}
-              value={enteredTask}
-            />
+            <View style = {styles.topRow}>
+              <TextInput 
+                placeholder="Input YOUR TASK !!" 
+                style={styles.input} 
+                onChangeText={taskInputHandler}
+                value={enteredTask}
+              />
+              <TouchableOpacity onPress = {() => setShow(true)}>
+                <View style = {styles.addTime}>
+                  <Image source = {require("../assets/img/timer.png")} style = {styles.icon} />
+                  <Text style = {{color: "#fff", fontSize: 10}}>Add time</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
             <View style={styles.buttonContainer}>
               <View style={styles.button}>
                 <Button title="Cancel" color="red" onPress={props.onCancel}></Button>
@@ -41,15 +50,6 @@ const TaskInput = props => {
               <View style={styles.button}>
                 <Button title="Add Task" onPress={addTaskHandler}></Button>
               </View>
-              {/* <View style = {{...styles.button, marginTop: 20, width: "80%"}}>
-                <Button title = "Add end time" color = "green" onPress = {() => setShow(true)} />
-              </View> */}
-              <TouchableOpacity onPress = {() => setShow(true)}>
-                <View style = {[styles.button, styles.addTime]}>
-                  <Image source = {require("../assets/img/timer.png")} style = {styles.icon} />
-                  <Text style = {{color: "#fff"}}>Add time</Text>
-                </View>
-              </TouchableOpacity>
             </View>
         </View>
         </Modal>
@@ -71,11 +71,10 @@ const styles = StyleSheet.create({
         alignItems:'center',
     },
     input:{
-    width:"80%", 
+      width: "60%", 
     borderWidth:1, 
     borderColor:"black", 
     padding:10,
-    marginBottom:10 
     },
     buttonContainer:{
       flexDirection:"row",
@@ -91,14 +90,24 @@ const styles = StyleSheet.create({
       height: 20,
       marginRight: 5
     },
+    topRow: {
+      flexDirection: "row",
+      width: "80%",
+      marginHorizontal: "10%",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 20
+    },
     addTime: {
-      marginTop: 10, 
-      width: "100%",
+      marginTop: 10,
       padding: 10,
       borderRadius: 2, 
       flexDirection: "row",
       backgroundColor: "green",
-      elevation: 5
+      elevation: 5,
+      alignItems: "center",
+      marginBottom: 10,
+      marginLeft: 10
     }
 })
 

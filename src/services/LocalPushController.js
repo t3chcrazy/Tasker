@@ -25,12 +25,12 @@ export const LocalNotification = () => {
     })
 }
 
-export const scheduleLocalNotification = milliseconds => {
+export const scheduleLocalNotification = (milliseconds, title = "Task Reminders") => {
     PushNotifications.localNotificationSchedule({
-        bigText: "Notification sent because of react-native-push-notifications",
-        subText: "Scheduled notification",
-        title: "My app title",
-        message: "Expand to see more",
+        bigText: "Tasker",
+        subText: "Task notification",
+        title: title,
+        message: `Reminder for ${title} task`,
         vibrate: true,
         vibration: 300,
         playSound: true,
