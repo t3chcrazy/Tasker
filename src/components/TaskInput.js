@@ -1,30 +1,80 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import {View, TextInput, Button, StyleSheet,Modal, TouchableOpacity, Image, Text} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { scheduleLocalNotification } from '../services/LocalPushController'
+import { scheduleLocalNotification, cancelLocalNotification } from '../services/LocalPushController'
+
+const generateRandomInt = () => Math.round(Math.random()*2**30).toString()
 
 const TaskInput = props => {
     const [enteredTask, setEnteredTask] = useState('');
     const [date, setDate] = useState(() => new Date(Date.now()));
     const [show, setShow] = useState(false);
+    const [showTime, setShowTime] = useState(false);
+    const [time, setTime] = useState(() => new Date(Date.now()));
+    const [currId, setCurrId] = useState(null)
     const taskInputHandler = (enteredTask) =>  {
         setEnteredTask(enteredTask);
     };
     const addTaskHandler = () => {
-      props.onAddTask({taskTitle: enteredTask, endTime: date.toLocaleTimeString("en-US").substring(0, 5)});
+      const finalDate = date
+      finalDate.setHours(time.getHours(), time.getMinutes(), 0)
+      console.log("Milliseconds", finalDate.getTime()-new Date(Date.now()).getTime())
+      scheduleLocalNotification(finalDate.getTime()-new Date(Date.now()).getTime(), enteredTask, currId);
+      props.onAddTask({id: currId, taskTitle: enteredTask, endTime: finalDate.toLocaleString("en-US").substring(0, 16)});
       setEnteredTask('');
+    }
+    // Handle changes in date picker value
+    const handleDateChange = (event, selected) => {
+      const currDate = selected || date;
+      console.log("Event object for date change", event)
+      setShow(false);
+      setDate(prev => prev.getTime() === currDate.getTime()? prev: currDate);
+      if (event.type === "set") {
+        setShowTime(true);
+      }
     }
     // Handle changes in time picker value
     const handleTimeChange = (event, selected) => {
-      const currDate = selected || date;
-      console.log(currDate.toLocaleTimeString([], {is24Hour: false}))
-      setShow(false);
-      if (currDate.getTime() !== date.getTime()) {
-        currDate.setSeconds(0);
-        scheduleLocalNotification(currDate.getTime()-new Date(Date.now()).getTime(), enteredTask);
-        setDate(currDate);
-      };
+      setShowTime(false);
+      console.log(selected.getHours(), selected)
+      if (event.type === "set") {
+        const currTime = selected || time;
+        currTime.setSeconds(0);
+        setTime(currTime);
+      }
     }
+    const editTaskHandler = () => {
+      cancelLocalNotification(props.editTaskId)
+      const finalDate = date
+      console.log("difference between times when editing", finalDate.getTime()-new Date(Date.now()).getTime())
+      console.log("final time", finalDate.getTime(), "start time", new Date(Date.now()).getTime())
+      console.log("final date", finalDate, "start date", new Date(Date.now()))
+      finalDate.setHours(time.getHours(), time.getMinutes(), 0)
+      scheduleLocalNotification(finalDate.getTime()-new Date(Date.now()).getTime(), enteredTask, props.editTaskId);
+      props.editFinish({id: props.editTaskId, taskTitle: enteredTask, endTime: finalDate.toLocaleString("en-US").substring(0, 16)});
+      setEnteredTask("")
+    }
+    const handleCancelPress = () => {
+      setCurrId(null)
+      props.onCancel()
+    }
+    useEffect(() => {
+      console.log(props.tasks)
+      if (props.visible) {
+        if (props.editTaskId !== null) {
+          const editableTask = props.tasks.find(task => task.id === props.editTaskId)
+          console.log("Setting time for editing", editableTask.endTime)
+          setEnteredTask(editableTask.taskTitle)
+          setDate(new Date(editableTask.endTime))
+          setTime(new Date(editableTask.endTime))
+          setCurrId(editableTask.id)
+        }
+        else {
+          setEnteredTask("")
+          setCurrId(generateRandomInt())
+        }
+      }
+    }, [props.visible])
     return(
       <>
         <Modal visible={props.visible} animationType="slide">
@@ -45,21 +95,25 @@ const TaskInput = props => {
             </View>
             <View style={styles.buttonContainer}>
               <View style={styles.button}>
-                <Button title="Cancel" color="red" onPress={props.onCancel}></Button>
+                <Button title="Cancel" color="red" onPress={handleCancelPress}></Button>
               </View>
               <View style={styles.button}>
-                <Button title="Add Task" onPress={addTaskHandler}></Button>
+                <Button title={props.editTaskId === null? "Add task": "Edit task"} onPress={props.editTaskId === null? addTaskHandler: editTaskHandler}></Button>
               </View>
             </View>
         </View>
         </Modal>
         {show && 
           <DateTimePicker
-            onChange = {handleTimeChange}
+            onChange = {handleDateChange}
             value = {date}
-            mode = "time"
+          />}
+          {showTime && 
+          <DateTimePicker
+            onChange = {handleTimeChange}
+            value = {time}
             is24Hour = {false}
-            display = "clock"
+            mode = "time"
           />}
       </>
       );
