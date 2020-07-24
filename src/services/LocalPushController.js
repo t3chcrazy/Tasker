@@ -25,7 +25,7 @@ export const LocalNotification = () => {
     })
 }
 
-export const scheduleLocalNotification = (milliseconds, title = "Task Reminders", taskId) => {
+export const scheduleLocalNotification = (fireDate, title = "Task Reminders", taskId) => {
     PushNotifications.localNotificationSchedule({
         id: taskId,
         bigText: "Tasker",
@@ -37,7 +37,7 @@ export const scheduleLocalNotification = (milliseconds, title = "Task Reminders"
         playSound: true,
         soundName: "default",
         actions: '["Yes", "No"]',
-        date: new Date(Date.now()+milliseconds),
+        date: fireDate,
     })
 }
 

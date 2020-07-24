@@ -57,7 +57,7 @@ export default function App() {
           renderItem={itemData => <TaskItem id={itemData.item.id} onDelete={removeTaskHandler} title={itemData.item.taskTitle} endTime = {itemData.item.endTime} onEdit = {editTaskHandler} />} 
           contentContainerStyle = {{flexDirection: "column"}}
         /> */}
-        {courseTasks.map(item => <TaskItem key = {`task${item.id}`} id={item.id} onDelete={removeTaskHandler} title={item.taskTitle} endTime = {item.endTime} onEdit = {editTaskHandler} />)}
+        {courseTasks.map(item => <TaskItem key = {`task${item.id}`} id={item.id} onDelete={removeTaskHandler} title={item.taskTitle} endTime = {item.endTime.toLocaleString("en-US").substring(0, 16)} onEdit = {editTaskHandler} />)}
       </View>
     </ScrollView>
   );

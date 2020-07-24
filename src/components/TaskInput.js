@@ -18,9 +18,8 @@ const TaskInput = props => {
     const addTaskHandler = () => {
       const finalDate = date
       finalDate.setHours(time.getHours(), time.getMinutes(), 0)
-      console.log("Milliseconds", finalDate.getTime()-new Date(Date.now()).getTime())
-      scheduleLocalNotification(finalDate.getTime()-new Date(Date.now()).getTime(), enteredTask, currId);
-      props.onAddTask({id: currId, taskTitle: enteredTask, endTime: finalDate.toLocaleString("en-US").substring(0, 16)});
+      scheduleLocalNotification(finalDate, enteredTask, currId);
+      props.onAddTask({id: currId, taskTitle: enteredTask, endTime: finalDate});
       setEnteredTask('');
     }
     // Handle changes in date picker value
@@ -46,12 +45,10 @@ const TaskInput = props => {
     const editTaskHandler = () => {
       cancelLocalNotification(props.editTaskId)
       const finalDate = date
-      console.log("difference between times when editing", finalDate.getTime()-new Date(Date.now()).getTime())
-      console.log("final time", finalDate.getTime(), "start time", new Date(Date.now()).getTime())
-      console.log("final date", finalDate, "start date", new Date(Date.now()))
       finalDate.setHours(time.getHours(), time.getMinutes(), 0)
-      scheduleLocalNotification(finalDate.getTime()-new Date(Date.now()).getTime(), enteredTask, props.editTaskId);
-      props.editFinish({id: props.editTaskId, taskTitle: enteredTask, endTime: finalDate.toLocaleString("en-US").substring(0, 16)});
+      console.log(finalDate)
+      scheduleLocalNotification(finalDate, enteredTask, props.editTaskId);
+      props.editFinish({id: props.editTaskId, taskTitle: enteredTask, endTime: finalDate});
       setEnteredTask("")
     }
     const handleCancelPress = () => {
@@ -65,8 +62,8 @@ const TaskInput = props => {
           const editableTask = props.tasks.find(task => task.id === props.editTaskId)
           console.log("Setting time for editing", editableTask.endTime)
           setEnteredTask(editableTask.taskTitle)
-          setDate(new Date(editableTask.endTime))
-          setTime(new Date(editableTask.endTime))
+          setDate(editableTask.endTime)
+          setTime(editableTask.endTime)
           setCurrId(editableTask.id)
         }
         else {
