@@ -16,8 +16,8 @@ const TaskInput = props => {
         setEnteredTask(enteredTask);
     };
     const addTaskHandler = () => {
-      const finalDate = date
-      finalDate.setHours(time.getHours(), time.getMinutes(), 0)
+      const finalDate = new Date(+date)
+      finalDate.setHours(time.getHours(), time.getMinutes(), 0);
       scheduleLocalNotification(finalDate, enteredTask, currId);
       props.onAddTask({id: currId, taskTitle: enteredTask, endTime: finalDate});
       setEnteredTask('');
@@ -25,7 +25,6 @@ const TaskInput = props => {
     // Handle changes in date picker value
     const handleDateChange = (event, selected) => {
       const currDate = selected || date;
-      console.log("Event object for date change", event)
       setShow(false);
       setDate(prev => prev.getTime() === currDate.getTime()? prev: currDate);
       if (event.type === "set") {
@@ -43,32 +42,32 @@ const TaskInput = props => {
       }
     }
     const editTaskHandler = () => {
-      cancelLocalNotification(props.editTaskId)
-      const finalDate = date
-      finalDate.setHours(time.getHours(), time.getMinutes(), 0)
-      console.log(finalDate)
+      cancelLocalNotification(props.editTaskId);
+      const finalDate = new Date(+date);
+      finalDate.setHours(time.getHours(), time.getMinutes(), 0);
+      console.log(finalDate);
       scheduleLocalNotification(finalDate, enteredTask, props.editTaskId);
       props.editFinish({id: props.editTaskId, taskTitle: enteredTask, endTime: finalDate});
-      setEnteredTask("")
+      setEnteredTask("");
     }
     const handleCancelPress = () => {
-      setCurrId(null)
-      props.onCancel()
+      setCurrId(null);
+      props.onCancel();
     }
     useEffect(() => {
       console.log(props.tasks)
       if (props.visible) {
         if (props.editTaskId !== null) {
-          const editableTask = props.tasks.find(task => task.id === props.editTaskId)
-          console.log("Setting time for editing", editableTask.endTime)
-          setEnteredTask(editableTask.taskTitle)
-          setDate(editableTask.endTime)
-          setTime(editableTask.endTime)
-          setCurrId(editableTask.id)
+          const editableTask = props.tasks.find(task => task.id === props.editTaskId);
+          console.log("Setting time for editing", editableTask.endTime);
+          setEnteredTask(editableTask.taskTitle);
+          setDate(editableTask.endTime);
+          setTime(editableTask.endTime);
+          setCurrId(editableTask.id);
         }
         else {
-          setEnteredTask("")
-          setCurrId(generateRandomInt())
+          setEnteredTask("");
+          setCurrId(generateRandomInt());
         }
       }
     }, [props.visible])
@@ -86,7 +85,7 @@ const TaskInput = props => {
               <TouchableOpacity onPress = {() => setShow(true)}>
                 <View style = {styles.addTime}>
                   <Image source = {require("../assets/img/timer.png")} style = {styles.icon} />
-                  <Text style = {{color: "#fff", fontSize: 10}}>Add time</Text>
+                  <Text style = {{color: "#fff", fontSize: 10}}>Add date & time</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -95,7 +94,7 @@ const TaskInput = props => {
                 <Button title="Cancel" color="red" onPress={handleCancelPress}></Button>
               </View>
               <View style={styles.button}>
-                <Button title={props.editTaskId === null? "Add task": "Edit task"} onPress={props.editTaskId === null? addTaskHandler: editTaskHandler}></Button>
+                <Button title={props.editTaskId === null? "Add task": "Update task"} onPress={props.editTaskId === null? addTaskHandler: editTaskHandler}></Button>
               </View>
             </View>
         </View>
